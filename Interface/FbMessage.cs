@@ -1,6 +1,6 @@
 ﻿using Elements.Core;
-using OscCore;
 using System;
+using System.Runtime.InteropServices;
 
 namespace QuestProModule;
 
@@ -9,64 +9,78 @@ public class FbMessage
   private const int NaturalExpressionsCount = 63;
   private const float SranipalNormalizer = 0.75f;
   public readonly float[] Expressions = new float[NaturalExpressionsCount + 8 * 2];
-	public readonly float[] ExpressionsBuffer = new float[NaturalExpressionsCount + 8 * 2];
-	private object expressionsLock = new object();
-	private int[] messageCount = new int[3]; // To track the number of messages received for each address
 
-	public void ParseOsc(OscMessageRaw message)
-  {	
-		int index = 0;
-		if (message.Address == "/tracking/eye/left/Quat")
-		{
-			Array.Clear(ExpressionsBuffer, FbExpression.LeftRot_w, 4);
-			index = FbExpression.LeftRot_w;
-		} else if (message.Address == "/tracking/eye/right/Quat")
-		{
-			Array.Clear(ExpressionsBuffer, FbExpression.RightRot_w, 4);
-			index = FbExpression.RightRot_w;
-		} else
-		{
-			Array.Clear(ExpressionsBuffer, 0, 63);
-		}
-    foreach (var arg in message)
+  // Define the struct matching the ALVR VRCFT protocol
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct AlvrTrackingPacket
+  {
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 63)]
+    public float[] FaceWeights;
+
+    // Left Eye
+    public float EyeLeftPosX;
+    public float EyeLeftPosY;
+    public float EyeLeftPosZ;
+    public float EyeLeftRotX;
+    public float EyeLeftRotY;
+    public float EyeLeftRotZ;
+    public float EyeLeftRotW;
+
+    // Right Eye
+    public float EyeRightPosX;
+    public float EyeRightPosY;
+    public float EyeRightPosZ;
+    public float EyeRightRotX;
+    public float EyeRightRotY;
+    public float EyeRightRotZ;
+    public float EyeRightRotW;
+  }
+
+  public void ParseUdp(byte[] data)
+  {
+    if (data.Length < Marshal.SizeOf<AlvrTrackingPacket>()) return;
+
+    var packet = BytesToStruct<AlvrTrackingPacket>(data);
+
+    // Map Face Weights
+    for (int i = 0; i < 63; i++)
     {
-      // this osc library is strange.
-      var localArg = arg;
-			ExpressionsBuffer[index] = message.ReadFloat(ref localArg);
-
-      index++;
+      Expressions[i] = packet.FaceWeights[i];
     }
 
-		//// Clear the rest if it wasn't long enough for some reason.
-		//for (; index < ExpressionsBuffer.Length; index++)
-		//{
-		//  ExpressionsBuffer[index] = 0.0f;
-		//}
+    // Map Left Eye
+    Expressions[FbExpression.LeftPos_x] = packet.EyeLeftPosX;
+    Expressions[FbExpression.LeftPos_y] = packet.EyeLeftPosY;
+    Expressions[FbExpression.LeftPos_z] = packet.EyeLeftPosZ;
+    Expressions[FbExpression.LeftRot_x] = packet.EyeLeftRotX;
+    Expressions[FbExpression.LeftRot_y] = packet.EyeLeftRotY;
+    Expressions[FbExpression.LeftRot_z] = packet.EyeLeftRotZ;
+    Expressions[FbExpression.LeftRot_w] = packet.EyeLeftRotW;
 
-		// Im not sure why this was done, but what I am sure of is that this breaks the eye look by setting it to 0
+    // Map Right Eye
+    Expressions[FbExpression.RightPos_x] = packet.EyeRightPosX;
+    Expressions[FbExpression.RightPos_y] = packet.EyeRightPosY;
+    Expressions[FbExpression.RightPos_z] = packet.EyeRightPosZ;
+    Expressions[FbExpression.RightRot_x] = packet.EyeRightRotX;
+    Expressions[FbExpression.RightRot_y] = packet.EyeRightRotY;
+    Expressions[FbExpression.RightRot_z] = packet.EyeRightRotZ;
+    Expressions[FbExpression.RightRot_w] = packet.EyeRightRotW;
 
-		// Check if all three messages have been received
-		if (message.Address == "/tracking/eye/left/Quat" || message.Address == "/tracking/eye/right/Quat" || message.Address == "/tracking/face_fb")
-		{
-			int messageIndex = message.Address == "/tracking/eye/left/Quat" ? 0 : message.Address == "/tracking/eye/right/Quat" ? 1 : 2;
+    PrepareUpdate();
+  }
 
-			lock (expressionsLock)
-			{
-				messageCount[messageIndex]++;
-
-				// If all three messages have been received, copy the results to the ExpressionsBuffer
-				if (messageCount[0] > 0 && messageCount[1] > 0 && messageCount[2] > 0)
-				{
-					Array.Copy(ExpressionsBuffer, Expressions, Expressions.Length);
-					messageCount[0] = 0;
-					messageCount[1] = 0;
-					messageCount[2] = 0;
-
-					PrepareUpdate();
-				}
-			}
-		}
-	}
+  private static T BytesToStruct<T>(byte[] bytes) where T : struct
+  {
+    GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+    try
+    {
+      return Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+    }
+    finally
+    {
+      handle.Free();
+    }
+  }
 
   private static bool FloatNear(float f1, float f2) => Math.Abs(f1 - f2) < 0.0001;
 

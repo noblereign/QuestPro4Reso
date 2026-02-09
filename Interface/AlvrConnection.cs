@@ -3,7 +3,6 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using OscCore;
 
 namespace QuestProModule;
 
@@ -25,7 +24,7 @@ public class AlvrConnection : IDisposable
     _messageTarget = target;
     _client = new UdpClient(port);
     _listenTask = Task.Run(ListenAsync);
-    Msg($"Opening Alvr connection on {port}");
+    UniLog.Log($"[QuestPro4Reso] Opening ALVR connection on {port}");
   }
 
   private async Task ListenAsync()
@@ -35,34 +34,25 @@ public class AlvrConnection : IDisposable
       try
       {
         var got = await _client.ReceiveAsync();
-        var message = new OscMessageRaw(new ArraySegment<byte>(got.Buffer));
-        switch (message.Address)
+        
+        // Parse the raw UDP packet directly
+        _workingMessage.ParseUdp(got.Buffer);
+        
+        if (!_stopToken.IsCancellationRequested)
         {
-          case "/tracking/eye/left/Quat":
-          case "/tracking/eye/right/Quat":
-		  case "/tracking/face_fb":
-			_workingMessage.ParseOsc(message);
-			if (!_stopToken.IsCancellationRequested)
-			{
-			  _messageTarget.Swap(ref _workingMessage);
-			}
-			break;
-		  case "/tracking/eye_htc":
-          case "/tracking/lip_htc":
-            Error("Unexpected ALVR message in loading area, please use facebook eye tracking.");
-            break;
+          _messageTarget.Swap(ref _workingMessage);
         }
       }
       catch (Exception ex)
       {
-        Error(ex.Message);
+        UniLog.Error(ex.Message);
       }
     }
   }
 
   public void Dispose()
   {
-    Msg("Alvr connection closing.");
+    UniLog.Log("ALVR connection closing.");
     _stopToken.Cancel();
     _client.Dispose();
   }

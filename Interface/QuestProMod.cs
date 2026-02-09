@@ -9,7 +9,7 @@ public class QuestProMod : ResoniteMod
 {
   [AutoRegisterConfigKey] private static readonly ModConfigurationKey<int> AlvrListenPort =
     new("quest_pro_alvr_port",
-      "The port alvr will communicate with, this should be VrcFaceTracking Osc mode in alvr.", () => DefaultPort);
+      "The port alvr will communicate with, this should be the VrcFaceTracking UDP port in alvr.", () => DefaultPort);
 
   [AutoRegisterConfigKey] private static readonly ModConfigurationKey<float> EyeOpennessExponent =
     new("quest_pro_eye_open_exponent",
