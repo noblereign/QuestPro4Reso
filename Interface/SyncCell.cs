@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace QuestProModule
+﻿namespace QuestProModule
 {
   public class SyncCell<T> where T : class, new()
   {

@@ -1,8 +1,5 @@
 ﻿using Elements.Core;
-using System;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace QuestProModule;
 
@@ -45,14 +42,14 @@ public class AlvrConnection : IDisposable
       }
       catch (Exception ex)
       {
-        UniLog.Error(ex.Message);
+        UniLog.Error($"[QuestPro4Reso] {ex.Message}");
       }
     }
   }
 
   public void Dispose()
   {
-    UniLog.Log("ALVR connection closing.");
+    UniLog.Log("[QuestPro4Reso] ALVR connection closing.");
     _stopToken.Cancel();
     _client.Dispose();
   }

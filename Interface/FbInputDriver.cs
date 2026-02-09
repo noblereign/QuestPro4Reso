@@ -1,12 +1,13 @@
-﻿using Elements.Core;
+﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+using Elements.Core;
 using FrooxEngine;
-using System;
 
 namespace QuestProModule;
 
 public class FbInputDriver : IInputDriver
 {
     private readonly SyncCell<FbMessage> _source;
+    private readonly AlvrConnection _connection;
     private FbMessage _c = new();
 
     private InputInterface _input;
@@ -19,9 +20,10 @@ public class FbInputDriver : IInputDriver
     public float EyeMoveMulti = 1.0f;
     public float EyeExpressionMulti = 1.0f;
 
-    public FbInputDriver(SyncCell<FbMessage> source)
+    public FbInputDriver(SyncCell<FbMessage> source, AlvrConnection connection)
     {
         _source = source;
+        _connection = connection;
     }
 
     /// <summary>
@@ -258,6 +260,13 @@ public class FbInputDriver : IInputDriver
 
         _mouth.CheekLeftPuffSuck = _c.Expressions[FbExpression.Cheek_Puff_L];
         _mouth.CheekRightPuffSuck = _c.Expressions[FbExpression.Cheek_Puff_R];
+    }
+
+    public void Dispose()
+    {
+        UniLog.Log("[QuestPro4Reso] Driver disposal called");
+        _connection.Dispose();
+        UniLog.Log("[QuestPro4Reso] Driver disposed");
     }
 
     public struct EyeGazeData
