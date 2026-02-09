@@ -1,4 +1,4 @@
-﻿using BaseX;
+﻿using Elements.Core;
 using System;
 using System.Net.Sockets;
 using System.Threading;
@@ -25,7 +25,7 @@ public class AlvrConnection : IDisposable
     _messageTarget = target;
     _client = new UdpClient(port);
     _listenTask = Task.Run(ListenAsync);
-    UniLog.Log($"Opening Alvr connection on {port}");
+    Msg($"Opening Alvr connection on {port}");
   }
 
   private async Task ListenAsync()
@@ -49,20 +49,20 @@ public class AlvrConnection : IDisposable
 			break;
 		  case "/tracking/eye_htc":
           case "/tracking/lip_htc":
-            UniLog.Error("Unexpected ALVR message in loading area, please use facebook eye tracking.");
+            Error("Unexpected ALVR message in loading area, please use facebook eye tracking.");
             break;
         }
       }
       catch (Exception ex)
       {
-        UniLog.Error(ex.Message);
+        Error(ex.Message);
       }
     }
   }
 
   public void Dispose()
   {
-    UniLog.Log("Alvr connection closing.");
+    Msg("Alvr connection closing.");
     _stopToken.Cancel();
     _client.Dispose();
   }

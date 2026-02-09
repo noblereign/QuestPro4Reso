@@ -1,11 +1,11 @@
 ﻿using HarmonyLib;
-using NeosModLoader;
+using ResoniteModLoader;
 using FrooxEngine;
 using System.Threading;
 
 namespace QuestProModule;
 
-public class QuestProMod : NeosMod
+public class QuestProMod : ResoniteMod
 {
   [AutoRegisterConfigKey] private static readonly ModConfigurationKey<int> AlvrListenPort =
     new("quest_pro_alvr_port",
@@ -61,10 +61,10 @@ public class QuestProMod : NeosMod
   /// </summary>
   private const int DefaultPort = 9620;
 
-  public override string Name => "QuestPro4Neos";
-  public override string Author => "dfgHiatus & Geenz & Earthmark";
-  public override string Version => "2.0.0";
-  public override string Link => "https://github.com/dfgHiatus/QuestPro4Neos";
+  public override string Name => "QuestPro4Reso";
+  public override string Author => "Noble, dfgHiatus, Geenz, Earthmark";
+  public override string Version => "3.0.0";
+  public override string Link => "https://github.com/noblereign/QuestPro4Reso";
 
   public override void OnEngineInit()
   {
