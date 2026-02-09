@@ -103,7 +103,6 @@ public class FbInputDriver : IInputDriver
     public void UpdateEyes(float deltaTime)
     {
         _eyes.IsEyeTrackingActive = _input.VR_Active;
-        _eyes.LeftEye.IsTracking = _input.VR_Active;
 
         var leftEyeData = GetEyeData(FbEye.Left);
         var rightEyeData = GetEyeData(FbEye.Right);
@@ -187,20 +186,20 @@ public class FbInputDriver : IInputDriver
         switch (fbEye)
         {
             case FbEye.Left:
-                eyeRet.Position = new float3(_c.Expressions[FbExpression.LeftPos_x], -_c.Expressions[FbExpression.LeftPos_y],
-                  _c.Expressions[FbExpression.LeftPos_z]);
-                eyeRet.Rotation = new floatQ(-_c.Expressions[FbExpression.LeftRot_x], -_c.Expressions[FbExpression.LeftRot_y],
-                  -_c.Expressions[FbExpression.LeftRot_z], _c.Expressions[FbExpression.LeftRot_w]);
+                eyeRet.Position = new float3(_c.Expressions[FbExpression.Left_Pos_X], -_c.Expressions[FbExpression.Left_Pos_Y],
+                  _c.Expressions[FbExpression.Left_Pos_Z]);
+                eyeRet.Rotation = new floatQ(-_c.Expressions[FbExpression.Left_Rot_X], -_c.Expressions[FbExpression.Left_Rot_Y],
+                  -_c.Expressions[FbExpression.Left_Rot_Z], _c.Expressions[FbExpression.Left_Rot_W]);
                 eyeRet.Open = MathX.Max(0, _c.Expressions[FbExpression.Eyes_Closed_L]);
                 eyeRet.Squeeze = _c.Expressions[FbExpression.Lid_Tightener_L];
                 eyeRet.Wide = _c.Expressions[FbExpression.Upper_Lid_Raiser_L];
                 eyeRet.IsValid = IsValid(eyeRet.Position);
                 return eyeRet;
             case FbEye.Right:
-                eyeRet.Position = new float3(_c.Expressions[FbExpression.RightPos_x], -_c.Expressions[FbExpression.RightPos_y],
-                  _c.Expressions[FbExpression.RightPos_z]);
-                eyeRet.Rotation = new floatQ(-_c.Expressions[FbExpression.LeftRot_x], -_c.Expressions[FbExpression.LeftRot_y],
-                  -_c.Expressions[FbExpression.LeftRot_z], _c.Expressions[FbExpression.RightRot_w]);
+                eyeRet.Position = new float3(_c.Expressions[FbExpression.Right_Pos_X], -_c.Expressions[FbExpression.Right_Pos_Y],
+                  _c.Expressions[FbExpression.Right_Pos_Z]);
+                eyeRet.Rotation = new floatQ(-_c.Expressions[FbExpression.Right_Rot_X], -_c.Expressions[FbExpression.Right_Rot_Y],
+                  -_c.Expressions[FbExpression.Right_Rot_Z], _c.Expressions[FbExpression.Right_Rot_W]);
                 eyeRet.Open = MathX.Max(0, _c.Expressions[FbExpression.Eyes_Closed_R]);
                 eyeRet.Squeeze = _c.Expressions[FbExpression.Lid_Tightener_R];
                 eyeRet.Wide = _c.Expressions[FbExpression.Upper_Lid_Raiser_R];
