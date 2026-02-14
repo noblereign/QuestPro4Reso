@@ -70,7 +70,7 @@ public static class FbExpression
     public const int Tongue_Front_Dorsal_Palate = 65;
     public const int Tongue_Mid_Dorsal_Palate = 66;
     public const int Tongue_Back_Dorsal_Velar = 67;
-    public const int Tongue_Out_Fb = 68;
+    public const int Tongue_Out = 68;
     public const int Tongue_Retreat = 69;
     public const int Face1_Fb_Max = 63;
     public const int Face2_Fb_Max = 70;

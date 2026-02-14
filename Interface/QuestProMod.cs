@@ -38,7 +38,7 @@ public class QuestProMod : ResoniteMod
 
     public override string Name => "QuestPro4Reso";
     public override string Author => "Noble, dfgHiatus, Geenz, Earthmark";
-    public override string Version => "3.0.0";
+    public override string Version => "3.2.0";
     public override string Link => "https://github.com/noblereign/QuestPro4Reso";
 
     public override void OnEngineInit()

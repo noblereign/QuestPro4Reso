@@ -215,50 +215,41 @@ public class FbInputDriver : IInputDriver
         _mouth.IsDeviceActive = Engine.Current.InputInterface.VR_Active;
         _mouth.IsTracking = Engine.Current.InputInterface.VR_Active;
 
-        _mouth.JawOpen = _c.Expressions[FbExpression.Jaw_Drop] - _c.Expressions[FbExpression.Lips_Toward];
-
-
-        var jawHorizontal = _c.Expressions[FbExpression.Jaw_Sideways_Right] -
-                            _c.Expressions[FbExpression.Jaw_Sideways_Left];
-        var jawForward = _c.Expressions[FbExpression.Jaw_Thrust];
-        var jawDown = _c.Expressions[FbExpression.Jaw_Drop];
-
-        _mouth.Jaw = new float3(
-          jawHorizontal,
-          jawDown,
-          jawForward
-        );
-
+        _mouth.MouthLeftSmileFrown = _c.Expressions[FbExpression.Lip_Corner_Puller_L] - _c.Expressions[FbExpression.Lip_Corner_Depressor_L];
+        _mouth.MouthRightSmileFrown = _c.Expressions[FbExpression.Lip_Corner_Puller_R] - _c.Expressions[FbExpression.Lip_Corner_Depressor_R];
+        _mouth.MouthLeftDimple = _c.Expressions[FbExpression.Dimpler_L];
+        _mouth.MouthRightDimple = _c.Expressions[FbExpression.Dimpler_R];
+        _mouth.CheekLeftPuffSuck = _c.Expressions[FbExpression.Cheek_Puff_L] - _c.Expressions[FbExpression.Cheek_Suck_L];
+        _mouth.CheekRightPuffSuck = _c.Expressions[FbExpression.Cheek_Puff_R] - _c.Expressions[FbExpression.Cheek_Suck_R];
+        _mouth.CheekLeftRaise = _c.Expressions[FbExpression.Cheek_Raiser_L];
+        _mouth.CheekRightRaise = _c.Expressions[FbExpression.Cheek_Raiser_R];
         _mouth.LipUpperLeftRaise = _c.Expressions[FbExpression.Upper_Lip_Raiser_L];
         _mouth.LipUpperRightRaise = _c.Expressions[FbExpression.Upper_Lip_Raiser_R];
         _mouth.LipLowerLeftRaise = _c.Expressions[FbExpression.Lower_Lip_Depressor_L];
         _mouth.LipLowerRightRaise = _c.Expressions[FbExpression.Lower_Lip_Depressor_R];
-
-        _mouth.LipUpperHorizontal = _c.Expressions[FbExpression.Mouth_Right] - _c.Expressions[FbExpression.Mouth_Left];
-        _mouth.LipLowerHorizontal = _c.Expressions[FbExpression.Mouth_Right] - _c.Expressions[FbExpression.Mouth_Left];
-
-        _mouth.MouthLeftSmileFrown = _c.Expressions[FbExpression.Lip_Corner_Puller_L] -
-                                     _c.Expressions[FbExpression.Lip_Corner_Depressor_L];
-        _mouth.MouthRightSmileFrown = _c.Expressions[FbExpression.Lip_Corner_Puller_R] -
-                                      _c.Expressions[FbExpression.Lip_Corner_Depressor_R];
-
         _mouth.MouthPoutLeft = _c.Expressions[FbExpression.Lip_Pucker_L];
         _mouth.MouthPoutRight = _c.Expressions[FbExpression.Lip_Pucker_R];
-
+        _mouth.LipUpperHorizontal = _c.Expressions[FbExpression.Mouth_Right] - _c.Expressions[FbExpression.Mouth_Left];
+        _mouth.LipLowerHorizontal = _mouth.LipUpperHorizontal;
         _mouth.LipTopLeftOverturn = _c.Expressions[FbExpression.Lip_Funneler_LT];
         _mouth.LipTopRightOverturn = _c.Expressions[FbExpression.Lip_Funneler_RT];
-
         _mouth.LipBottomLeftOverturn = _c.Expressions[FbExpression.Lip_Funneler_LB];
         _mouth.LipBottomRightOverturn = _c.Expressions[FbExpression.Lip_Funneler_RB];
-
         _mouth.LipTopLeftOverUnder = -_c.Expressions[FbExpression.Lip_Suck_LT];
         _mouth.LipTopRightOverUnder = -_c.Expressions[FbExpression.Lip_Suck_RT];
-
-        _mouth.LipBottomLeftOverUnder = _c.Expressions[FbExpression.Chin_Raiser_B] - (_c.Expressions[FbExpression.Lip_Suck_LB]);
-        _mouth.LipBottomRightOverUnder = _c.Expressions[FbExpression.Chin_Raiser_B] - (_c.Expressions[FbExpression.Lip_Suck_RB]);
-
-        _mouth.CheekLeftPuffSuck = _c.Expressions[FbExpression.Cheek_Puff_L];
-        _mouth.CheekRightPuffSuck = _c.Expressions[FbExpression.Cheek_Puff_R];
+        _mouth.LipBottomLeftOverUnder = -_c.Expressions[FbExpression.Lip_Suck_LB];
+        _mouth.LipBottomRightOverUnder = -_c.Expressions[FbExpression.Lip_Suck_RB];
+        _mouth.LipLeftStretchTighten = _c.Expressions[FbExpression.Lip_Stretcher_L] - _c.Expressions[FbExpression.Lid_Tightener_L];
+        _mouth.LipRightStretchTighten = _c.Expressions[FbExpression.Lip_Stretcher_R] - _c.Expressions[FbExpression.Lid_Tightener_R];
+        _mouth.LipsLeftPress = _c.Expressions[FbExpression.Lip_Pressor_L];
+        _mouth.LipsRightPress = _c.Expressions[FbExpression.Lip_Pressor_R];
+        _mouth.Jaw = new float3(_c.Expressions[FbExpression.Jaw_Sideways_Right] - _c.Expressions[FbExpression.Jaw_Sideways_Left], -_c.Expressions[FbExpression.Lips_Toward], _c.Expressions[FbExpression.Jaw_Thrust]);
+        _mouth.JawOpen = MathX.Clamp01(_c.Expressions[FbExpression.Jaw_Drop] - _c.Expressions[FbExpression.Lips_Toward]);
+        _mouth.Tongue = new float3(0f, 0f, _c.Expressions[FbExpression.Tongue_Out] - _c.Expressions[FbExpression.Tongue_Retreat]);
+        _mouth.NoseWrinkleLeft = _c.Expressions[FbExpression.Nose_Wrinkler_L];
+        _mouth.NoseWrinkleRight = _c.Expressions[FbExpression.Nose_Wrinkler_R];
+        _mouth.ChinRaiseBottom = _c.Expressions[FbExpression.Chin_Raiser_B];
+        _mouth.ChinRaiseTop = _c.Expressions[FbExpression.Chin_Raiser_T];
     }
 
     public void Dispose()
